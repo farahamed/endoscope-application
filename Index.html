@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endoscope Camera</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Video Title Section -->
+    <div class="video-title">Endoscope's Video Viewer</div>
+ <!-- Control Buttons -->
+    <div class="controls">
+      
+      <!-- Switch to Stored Video Button -->
+      <button id="switchToStoredBtn" onclick="switchToStoredVideo()">Switch to Stored Video</button>
+      
+      <!-- Switch Back to Real-Time Video Button -->
+      <button id="switchToRealTimeBtn" onclick="switchToRealTimeVideo()" style="display:none;">Switch to Real-Time Video</button>
+    </div>
+  </div>
+    <!-- Video Box -->
+    <div class="video-box">
+      <!-- Real-Time Stream (Visible by default) -->
+      <video id="realTimeVideo" controls style="display:block;">
+        <source id="realTimeStream" src="http://192.168.4.1:81/stream" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      <!-- Stored Video (Initially Hidden) -->
+      <video id="storedVideo" controls style="display:none;">
+        <source src="fallback_video.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+
+   
+
+  <script>
+    // Switch to Stored Video manually
+    function switchToStoredVideo() {
+      let realTimeVideo = document.getElementById("realTimeVideo");
+      let storedVideo = document.getElementById("storedVideo");
+
+      // Hide real-time video and show stored video
+      realTimeVideo.style.display = "none";
+      storedVideo.style.display = "block";
+
+      // Show the "Switch to Real-Time Video" button
+      document.getElementById("switchToRealTimeBtn").style.display = "inline-block";
+      document.getElementById("switchToStoredBtn").style.display = "none";
+    }
+
+    // Switch Back to Real-Time Video manually
+    function switchToRealTimeVideo() {
+      let realTimeVideo = document.getElementById("realTimeVideo");
+      let storedVideo = document.getElementById("storedVideo");
+
+      // Hide stored video and show real-time video
+      realTimeVideo.style.display = "block";
+      storedVideo.style.display = "none";
+
+      // Hide the "Switch to Real-Time Video" button and show the "Switch to Stored Video" button
+      document.getElementById("switchToRealTimeBtn").style.display = "none";
+      document.getElementById("switchToStoredBtn").style.display = "inline-block";
+    }
+
+    // Check if real-time video is working
+    function checkRealTimeVideo() {
+      let realTimeVideo = document.getElementById("realTimeVideo");
+      let storedVideo = document.getElementById("storedVideo");
+
+      // Try to load the real-time video stream
+      let videoStream = document.getElementById("realTimeStream");
+      let realTimeVideoURL = videoStream.src;
+
+      // Fetch the real-time video URL to check availability
+      fetch(realTimeVideoURL, { method: "HEAD" })
+        .then((response) => {
+          if (response.ok) {
+            // If real-time stream is available, show it
+            realTimeVideo.style.display = "block";
+            storedVideo.style.display = "none";
+            document.getElementById("switchToStoredBtn").style.display = "inline-block";
+            console.log("Real-time stream loaded successfully.");
+          } else {
+            // If the real-time video fails, show the stored video
+            storedVideo.style.display = "block";
+            realTimeVideo.style.display = "none";
+            document.getElementById("switchToStoredBtn").style.display = "inline-block";
+            console.log("Fallback video being shown.");
+          }
+        })
+        .catch((error) => {
+          // If fetch fails, show fallback video
+          storedVideo.style.display = "block";
+          realTimeVideo.style.display = "none";
+          document.getElementById("switchToStoredBtn").style.display = "inline-block";
+          console.log("Error loading real-time video. Showing fallback.");
+        });
+    }
+
+    // Call the checkRealTimeVideo function on page load
+    window.onload = checkRealTimeVideo;
+  </script>
+</body>
+</html>
